@@ -4,8 +4,48 @@ using Microsoft.Extensions.Configuration;
 
 class Program
 {
+  static void PrintUsage()
+  {
+    Console.WriteLine("Usage: dotnet run [-- <manifestDir>]");
+    Console.WriteLine("       dotnet run -- list [<prefix>]");
+    Console.WriteLine();
+    Console.WriteLine("Default mode: parses every *.txt manifest in <manifestDir> (or");
+    Console.WriteLine("Settings:ManifestDirectory), classifies entries by extension, and");
+    Console.WriteLine("reports which .tif/.jpg files are missing from the configured S3 bucket.");
+    Console.WriteLine();
+    Console.WriteLine("Commands:");
+    Console.WriteLine("  list [<prefix>]         list files and sub-prefixes at the given S3 prefix");
+    Console.WriteLine("                          (no manifest comparison). Empty prefix = bucket root.");
+    Console.WriteLine();
+    Console.WriteLine("Positional:");
+    Console.WriteLine("  <manifestDir>           override Settings:ManifestDirectory");
+    Console.WriteLine();
+    Console.WriteLine("Options:");
+    Console.WriteLine("  -h, --help, -?, /?, ?   show this help and exit");
+    Console.WriteLine();
+    Console.WriteLine("Configuration (appsettings.json, Settings: section):");
+    Console.WriteLine("  ManifestDirectory, S3Bucket, Region");
+  }
+
   static async Task Main(string[] args)
   {
+    if (args.Any(a => a is "-h" or "--help" or "-?" or "/?" or "?"))
+    {
+      PrintUsage();
+      return;
+    }
+    foreach (var a in args)
+    {
+      if (a.StartsWith("-") || a.StartsWith("/"))
+      {
+        Console.WriteLine($"Unknown option: {a}");
+        Console.WriteLine();
+        PrintUsage();
+        Environment.ExitCode = 1;
+        return;
+      }
+    }
+
     var configuration = new ConfigurationBuilder()
       .SetBasePath(Directory.GetCurrentDirectory())
       .AddJsonFile("appsettings.json")

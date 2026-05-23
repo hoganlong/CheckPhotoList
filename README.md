@@ -34,7 +34,12 @@ dotnet run -- list
 
 # List files under a specific prefix
 dotnet run -- list /jpg
+
+# Print all commands and options
+dotnet run -- --help    # also: -h, -?, /?, ?
 ```
+
+Unknown flags (any unrecognized token starting with `-` or `/`) exit with code 1 after printing usage.
 
 ### list command output example
 
